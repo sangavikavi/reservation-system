@@ -5,15 +5,12 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.hashedin.reservation.entity.RestaurantUser;
-
+import com.hashedin.reservation.entity.Reservation;
 
 
 @Repository
-public interface UserRepository extends JpaRepository<RestaurantUser, Long> {
-        
-        Optional<RestaurantUser> findByEmail(String email);
-
-
+public interface ReservationRespository extends JpaRepository<Reservation, Long> {
     
+    Optional<Reservation> findById(Long id);
+   
 }

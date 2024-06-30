@@ -1,44 +1,48 @@
 package com.hashedin.reservation.entity;
 
 import java.sql.Date;
+import java.sql.Time;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+
 import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "restaurants")
-public class Restaurant {
+@Table(name = "reservation_requests")
+public class ReservationRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
-
-    @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
-    private String cuisines;
-
-    @Column(nullable = false)
-    private String location;
+    private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "manager_id", nullable = false)
-    private RestaurantUser manager;
+    @JoinColumn(name = "reservation_id", nullable = false)
+    private Reservation reservation;
+
+    @Column(nullable = false)
+    private Date requestDate;
+
+    @Column(nullable = false)
+    private Time slotStartTime;
+
+    @Column(nullable = false)
+    private Time slotEndTime;
+
+    @Column(nullable = false)
+    private String status;
 
     @Column(nullable = false)
     private Date createdAt;
 
     @Column(nullable = false)
     private Date updatedAt;
-
-    // Getters and setters
+    
 }
