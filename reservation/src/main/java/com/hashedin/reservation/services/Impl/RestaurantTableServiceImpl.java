@@ -6,12 +6,13 @@ import java.util.Optional;
 import javax.swing.text.html.Option;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.hashedin.reservation.entity.RestaurantTable;
 import com.hashedin.reservation.repository.RestaurantTableRepository;
 import com.hashedin.reservation.services.RestaurantTableService;
-
-public class RestaurantTableServiceImpl implements RestaurantTableService{
+@Service
+public class RestaurantTableServiceImpl implements RestaurantTableService {
 
     @Autowired
     private RestaurantTableRepository restaurantTableRepository;
@@ -23,24 +24,25 @@ public class RestaurantTableServiceImpl implements RestaurantTableService{
 
     @Override
     public RestaurantTable getRestaurantTableById(Long id) {
-        return restaurantTableRepository.findByTableId(id);
+        // return restaurantTableRepository.find(id);
+        return null;
     }
 
     @Override
     public List<RestaurantTable> getAllRestaurantTables() {
-        return restaurantTableRepository.getAllTables();
+        return restaurantTableRepository.findAll();
     }
 
     @Override
     public RestaurantTable updateRestaurantTable(Long id, RestaurantTable updatedTable) throws Exception {
         Optional<RestaurantTable> restaurantTableData = restaurantTableRepository.findById(id);
-        if(restaurantTableData.isPresent()){
+        if (restaurantTableData.isPresent()) {
             RestaurantTable _restaurantTable = restaurantTableData.get();
             _restaurantTable.setCapacity(updatedTable.getCapacity());
             _restaurantTable.setTableNumber(updatedTable.getTableNumber());
             return restaurantTableRepository.save(_restaurantTable);
         }
-		throw new Exception("Table Not found");
+        throw new Exception("Table Not found");
     }
 
     @Override
@@ -50,5 +52,11 @@ public class RestaurantTableServiceImpl implements RestaurantTableService{
         restaurantTableRepository.deleteById(id);
     }
 
-    
+    public List<RestaurantTable> getTablesByRestaurantId(Long id) {
+        //  Getting tables by restaurant
+        List<RestaurantTable> restaurantTables = restaurantTableRepository.findByRestaurantId(id);
+
+        return restaurantTables;
+    }
+
 }

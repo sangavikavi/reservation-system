@@ -1,4 +1,5 @@
 package com.hashedin.reservation.entity;
+import java.time.LocalDate;
 import java.util.*;
 
 import jakarta.persistence.Column;
@@ -15,7 +16,7 @@ import jakarta.persistence.Id;
 public class RestaurantUser {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private Long id;
 
     @Column(nullable = false)
     private String fullName;
@@ -33,9 +34,9 @@ public class RestaurantUser {
     private String role;
 
     @Column(nullable = false)
-    private Date createdAt;
+    private LocalDate createdAt;
 
     @Column(nullable = false)
-    private Date updatedAt;
+    private LocalDate updatedAt;
 
 }

@@ -6,13 +6,9 @@ import org.springframework.stereotype.Repository;
 import com.hashedin.reservation.entity.RestaurantTable;
 import java.util.List;
 
-
-
 @Repository
 public interface RestaurantTableRepository extends JpaRepository<RestaurantTable, Long> {
-   RestaurantTable findByTableId(Long tableId);
-    List<RestaurantTable> getAllTables();
-    RestaurantTable getTableById(Long id);
-    
-}
 
+    List<RestaurantTable> findByRestaurantId(Long id);
+
+}
