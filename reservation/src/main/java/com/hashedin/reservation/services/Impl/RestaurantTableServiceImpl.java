@@ -8,7 +8,10 @@ import javax.swing.text.html.Option;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.hashedin.reservation.Dtos.RequestDtos.RestaurantTableDto;
+import com.hashedin.reservation.entity.Restaurant;
 import com.hashedin.reservation.entity.RestaurantTable;
+import com.hashedin.reservation.repository.RestaurantRepository;
 import com.hashedin.reservation.repository.RestaurantTableRepository;
 import com.hashedin.reservation.services.RestaurantTableService;
 @Service
@@ -17,9 +20,21 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
     @Autowired
     private RestaurantTableRepository restaurantTableRepository;
 
+    @Autowired
+    private RestaurantRepository restaurantRepository;
+
     @Override
-    public RestaurantTable createRestaurantTable(RestaurantTable restaurantTable) {
-        return restaurantTableRepository.save(restaurantTable);
+    public RestaurantTable createRestaurantTable(RestaurantTableDto restaurantTable) throws Exception {
+        RestaurantTable newTable = new RestaurantTable();
+        newTable.setCapacity(restaurantTable.getCapacity());
+        newTable.setTableNumber(restaurantTable.getTableNumber());
+        newTable.setTableType(restaurantTable.getTableType());
+        if (restaurantTable.getRestaurantId() == null) {
+            throw new Exception("Restaurant Id is required");
+        }
+        Optional<Restaurant> restaurant = restaurantRepository.findById(restaurantTable.getRestaurantId());
+        newTable.setRestaurant(restaurant.get());
+        return restaurantTableRepository.save(newTable);
     }
 
     @Override

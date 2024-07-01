@@ -1,8 +1,9 @@
 package com.hashedin.reservation.entity;
 
-import java.sql.Date;
-import java.sql.Time;
-import java.util.UUID;
+
+
+
+import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,17 +28,26 @@ public class ReservationRequest {
     @JoinColumn(name = "reservation_id", nullable = false)
     private Reservation reservation;
 
-    @Column(nullable = false)
-    private Date requestDate;
+    // @Column(nullable = false)
+    // private Date requestDate;
+
+    // @Column(nullable = false)
+    // private Time slotStartTime;
+
+    // @Column(nullable = false)
+    // private Time slotEndTime;
+
+    // @Column(nullable = false)
+    // private String status;
 
     @Column(nullable = false)
-    private Time slotStartTime;
+    private Long tableId;
 
     @Column(nullable = false)
-    private Time slotEndTime;
+    private Long restaurantId;
 
     @Column(nullable = false)
-    private String status;
+    private Long userId;
 
     @Column(nullable = false)
     private Date createdAt;

@@ -1,7 +1,8 @@
 package com.hashedin.reservation.entity;
 
-import java.sql.Date;
-import java.sql.Time;
+import java.time.LocalTime;
+import java.util.Date;
+
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -39,10 +40,10 @@ public class Reservation {
     private Date reservationDate;
 
     @Column(nullable = false)
-    private Time slotStartTime;
+    private LocalTime slotStartTime;
 
     @Column(nullable = false)
-    private Time slotEndTime;
+    private LocalTime slotEndTime;
 
     @Column(nullable = false)
     private int numberOfGuests;

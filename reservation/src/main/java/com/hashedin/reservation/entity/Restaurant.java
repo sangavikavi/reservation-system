@@ -1,6 +1,10 @@
 package com.hashedin.reservation.entity;
 
-import java.sql.Date;
+
+import java.sql.Time;
+import java.time.LocalTime;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -33,6 +37,18 @@ public class Restaurant {
     @ManyToOne
     @JoinColumn(name = "manager_id", nullable = false)
     private RestaurantUser manager;
+
+    @Column(nullable = false)
+    private List<String> workingDays;
+
+    @Column(nullable = false)
+    private LocalTime openingTime;
+
+    @Column(nullable = false)
+    private LocalTime closingTime;
+
+    @Column(nullable = false)
+    private int capacity;
 
     @Column(nullable = false)
     private Date createdAt;

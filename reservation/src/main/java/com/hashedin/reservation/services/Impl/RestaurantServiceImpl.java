@@ -1,7 +1,8 @@
 package com.hashedin.reservation.services.Impl;
 
-import java.sql.Date;
+import java.util.Date;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,8 +44,11 @@ public class RestaurantServiceImpl implements RestaurantService {
         newRestaurant.setCuisines(restaurant.getCuisines());
         RestaurantUser manager = (uService.getUserByEmail(securityUtil.getCurrentUsername()));
         newRestaurant.setManager(manager);
-        newRestaurant.setCreatedAt(Date.valueOf(LocalDate.now()));
-        newRestaurant.setUpdatedAt(Date.valueOf(LocalDate.now()));
+        newRestaurant.setWorkingDays(restaurant.getWorkingDays());
+        newRestaurant.setOpeningTime(restaurant.getOpeningTime());
+        newRestaurant.setClosingTime(restaurant.getClosingTime());
+        newRestaurant.setCreatedAt(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        newRestaurant.setUpdatedAt(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
         return restaurantRepository.save(newRestaurant);
     }
 

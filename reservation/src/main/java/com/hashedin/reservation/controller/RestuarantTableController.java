@@ -2,10 +2,12 @@
 package com.hashedin.reservation.controller;
 
 
+import com.hashedin.reservation.Dtos.RequestDtos.RestaurantTableDto;
 import com.hashedin.reservation.entity.RestaurantTable;
 import com.hashedin.reservation.services.Impl.RestaurantTableServiceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -23,24 +25,29 @@ public class RestuarantTableController {
         return tableService.getAllRestaurantTables();
     }
 
-    @GetMapping("/{id}")
-    public RestaurantTable getTableById(@PathVariable Long id) {
-        return tableService.getRestaurantTableById(id);
+    // @GetMapping("/{id }")
+    // public RestaurantTable getTableById(@PathVariable Long id) {
+    //     return tableService.getRestaurantTableById(id);
+    // }
+
+    @PostMapping("/add")
+    public ResponseEntity<?> createTable(@RequestBody RestaurantTableDto table) {
+        try {
+            tableService.createRestaurantTable(table);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok("Table created successfully");
     }
 
-    @PostMapping
-    public RestaurantTable createTable(@RequestBody RestaurantTable table) {
-        return tableService.createRestaurantTable(table);
-    }
+    // @PutMapping("/{id}")
+    // public RestaurantTable updateTable(@PathVariable Long id, @RequestBody RestaurantTable table) throws Exception {
+    //     return tableService.updateRestaurantTable(id, table);
+    // }
 
-    @PutMapping("/{id}")
-    public RestaurantTable updateTable(@PathVariable Long id, @RequestBody RestaurantTable table) throws Exception {
-        return tableService.updateRestaurantTable(id, table);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteTable(@PathVariable Long id) {
-       // tableRepository.delete(id);
-       tableService.deleteRestaurantTable(id);
-    }
+    // @DeleteMapping("/{id}")
+    // public void deleteTable(@PathVariable Long id) {
+    //    // tableRepository.delete(id);
+    //    tableService.deleteRestaurantTable(id);
+    // }
 }

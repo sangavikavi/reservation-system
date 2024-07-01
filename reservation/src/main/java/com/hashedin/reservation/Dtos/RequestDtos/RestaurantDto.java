@@ -1,6 +1,7 @@
 package com.hashedin.reservation.Dtos.RequestDtos;
 
-import com.hashedin.reservation.entity.RestaurantUser;
+import java.time.LocalTime;
+import java.util.List;
 
 import lombok.Data;
 
@@ -9,5 +10,8 @@ public class RestaurantDto {
     private String name;
     private String cuisines;
     private String location;
+    private List<String> workingDays;
+    private LocalTime openingTime;
+    private LocalTime closingTime;
 }
 
