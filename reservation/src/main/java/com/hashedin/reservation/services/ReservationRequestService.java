@@ -17,6 +17,6 @@ public interface ReservationRequestService {
 
     ReservationRequest updateReservation(ReservationRequest reservation);
 
-    void deleteReservation(Long id);
+    void cancelReservation(Long id) throws Exception;
 
 } 

@@ -1,18 +1,12 @@
 package com.hashedin.reservation.services.Impl;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.LocalDateTime;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +24,12 @@ import com.hashedin.reservation.repository.ReservationRespository;
 import com.hashedin.reservation.repository.RestaurantRepository;
 import com.hashedin.reservation.repository.RestaurantTableRepository;
 
+/**
+ * This class implements the ReservationRequestService interface and provides
+ * the implementation for creating, updating, and canceling reservations.
+ * It also provides methods to retrieve reservations by table, by ID, and for
+ * getting all reservations.
+ */
 @Service
 public class ReservationRequestServiceImpl implements ReservationRequestService {
 
@@ -72,6 +72,10 @@ public class ReservationRequestServiceImpl implements ReservationRequestService 
         // If all the above conditions are satisfied then create the reservation
         // Else throw an exception
 
+        if (getReservationsbyTable(reservation.getTableId()) != null) {
+            throw new Exception("Table already reserved");
+        }
+
         Reservation newReservation = new Reservation();
         Restaurant restaurant = restaurantRepository.findById(reservation.getRestaurantId()).get();
         List<String> workingDays = restaurant.getWorkingDays();
@@ -97,6 +101,7 @@ public class ReservationRequestServiceImpl implements ReservationRequestService 
         RestaurantUser user = (uService.getUserByEmail(securityUtil.getCurrentUsername()));
         newReservation.setUser(user);
         newReservation.setStatus("PENDING");
+        reservationRepository.save(newReservation);
         RestaurantTable table = tableRepository.findById(reservation.getTableId()).get();
         if (table.getCapacity() < reservation.getNumberOfGuests()) {
             throw new Exception("Table does not have enough capacity Please book a bigger table");
@@ -116,7 +121,7 @@ public class ReservationRequestServiceImpl implements ReservationRequestService 
         return reservationRequestRepository.save(reservationRequest);
     }
 
-    public List<ReservationRequest> getReservationsbyTable(Long tableId) {
+    public ReservationRequest getReservationsbyTable(Long tableId) {
         return reservationRequestRepository.findByTableId(tableId);
     }
 
@@ -150,8 +155,82 @@ public class ReservationRequestServiceImpl implements ReservationRequestService 
     }
 
     @Override
-    public void deleteReservation(Long id) {
-        reservationRequestRepository.deleteById(id);
+    public void cancelReservation(Long id) throws Exception {
+        if (reservationRequestRepository.findById(id).isPresent()) {
+
+            ReservationRequest reservationRequest = reservationRequestRepository.findById(id).get();
+            if (reservationRequest.getReservation().getStatus().equals("PENDING")) {
+                reservationRequest.getReservation().setStatus("CANCELLED");
+                reservationRepository.delete(reservationRequest.getReservation());
+            }
+
+            if (reservationRequest.getReservation().getStatus().equals("CONFIRMED")) {
+                reservationRequest.getReservation().setStatus("PENDINGFORCANCELLATION");
+            }
+        } else {
+            throw new Exception("Reservation Request not Found");
+        }
+
+    }
+
+    public List<ReservationRequest> getAllReservationsbyRestaurant(Long restaurantId) {
+        return reservationRequestRepository.findByRestaurantId(restaurantId);
+    }
+
+    public void approveReservationRequest(Long id) throws Exception {
+
+        try {
+            if (!reservationRequestRepository.findById(id).isPresent()) {
+                throw new Exception("Reservation Request not Found");
+            }
+            ReservationRequest reservationRequest = reservationRequestRepository.findById(id).get();
+            reservationRequest.getReservation().setStatus("CONFIRMED");
+
+            Reservation reservation = reservationRepository.findById(reservationRequest.getReservation().getId()).get();
+            reservation.setStatus("CONFIRMED");
+            reservationRepository.save(reservation);
+            reservationRequestRepository.save(reservationRequest);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+
+    }
+
+    public void rejectReservationRequest(Long id) throws Exception {
+        try {
+            if (!reservationRequestRepository.findById(id).isPresent()) {
+                throw new Exception("Reservation Request not Found");
+            }
+            ReservationRequest reservationRequest = reservationRequestRepository.findById(id).get();
+            reservationRequest.getReservation().setStatus("REJECTED");
+
+            Reservation reservation = reservationRepository.findById(reservationRequest.getReservation().getId()).get();
+            reservation.setStatus("CANCELLED");
+            reservationRepository.delete(reservation);
+            reservationRequestRepository.save(reservationRequest);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+
+    }
+
+    public void approveCancellationRequest(Long id) throws Exception {
+        try {
+            if (!reservationRequestRepository.findById(id).isPresent()) {
+                throw new Exception("Reservation Request not Found");
+            }
+            ReservationRequest reservationRequest = reservationRequestRepository.findById(id).get();
+            reservationRequest.getReservation().setStatus("CANCELLED");
+
+            Reservation reservation = reservationRepository.findById(reservationRequest.getReservation().getId()).get();
+            reservation.setStatus("CANCELLED");
+            reservationRepository.delete(reservation);
+            reservationRequestRepository.save(reservationRequest);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+
+        }
+
     }
 
 }

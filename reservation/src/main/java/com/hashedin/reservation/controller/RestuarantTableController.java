@@ -1,7 +1,6 @@
 
 package com.hashedin.reservation.controller;
 
-
 import com.hashedin.reservation.Dtos.RequestDtos.RestaurantTableDto;
 import com.hashedin.reservation.entity.RestaurantTable;
 import com.hashedin.reservation.services.Impl.RestaurantTableServiceImpl;
@@ -10,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-
-
 
 @RestController
 @RequestMapping("/tables")
@@ -27,7 +24,7 @@ public class RestuarantTableController {
 
     // @GetMapping("/{id }")
     // public RestaurantTable getTableById(@PathVariable Long id) {
-    //     return tableService.getRestaurantTableById(id);
+    // return tableService.getRestaurantTableById(id);
     // }
 
     @PostMapping("/add")
@@ -40,14 +37,24 @@ public class RestuarantTableController {
         return ResponseEntity.ok("Table created successfully");
     }
 
-    // @PutMapping("/{id}")
-    // public RestaurantTable updateTable(@PathVariable Long id, @RequestBody RestaurantTable table) throws Exception {
-    //     return tableService.updateRestaurantTable(id, table);
-    // }
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateTable(@PathVariable Long id, @RequestBody RestaurantTable table) {
 
-    // @DeleteMapping("/{id}")
-    // public void deleteTable(@PathVariable Long id) {
-    //    // tableRepository.delete(id);
-    //    tableService.deleteRestaurantTable(id);
-    // }
+        try {
+            return ResponseEntity.ok(tableService.updateRestaurantTable(id, table));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTable(@PathVariable Long id) {
+        // tableRepository.delete(id);
+        try {
+            tableService.deleteRestaurantTable(id);
+            return ResponseEntity.ok("Table deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

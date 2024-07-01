@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.hashedin.reservation.Dtos.RequestDtos.RestaurantTableDto;
 import com.hashedin.reservation.entity.Restaurant;
 import com.hashedin.reservation.entity.RestaurantTable;
+import com.hashedin.reservation.repository.ReservationRespository;
 import com.hashedin.reservation.repository.RestaurantRepository;
 import com.hashedin.reservation.repository.RestaurantTableRepository;
 import com.hashedin.reservation.services.RestaurantTableService;
@@ -22,6 +23,9 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
 
     @Autowired
     private RestaurantRepository restaurantRepository;
+
+    @Autowired
+    private ReservationRespository reservationRespository;
 
     @Override
     public RestaurantTable createRestaurantTable(RestaurantTableDto restaurantTable) throws Exception {
@@ -50,6 +54,11 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
 
     @Override
     public RestaurantTable updateRestaurantTable(Long id, RestaurantTable updatedTable) throws Exception {
+
+        if (reservationRespository.findByTableId(id).size() > 0) {
+            throw new Exception("Table has bookings, cannot update");
+        }
+        
         Optional<RestaurantTable> restaurantTableData = restaurantTableRepository.findById(id);
         if (restaurantTableData.isPresent()) {
             RestaurantTable _restaurantTable = restaurantTableData.get();
@@ -61,9 +70,10 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
     }
 
     @Override
-    public void deleteRestaurantTable(Long id) {
-        // Need to check if there is any bookings for that table
-        // If there is then raise an error
+    public void deleteRestaurantTable(Long id) throws Exception {
+        if (reservationRespository.findByTableId(id).size() > 0) {
+            throw new Exception("Table has bookings, cannot update");
+        }
         restaurantTableRepository.deleteById(id);
     }
 

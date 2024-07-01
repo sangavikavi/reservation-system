@@ -1,7 +1,6 @@
 package com.hashedin.reservation.services.Impl;
 
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,19 +8,32 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hashedin.reservation.Config.SecurityUtil;
 import com.hashedin.reservation.Dtos.RequestDtos.UserEntryDto;
+import com.hashedin.reservation.entity.ReservationRequest;
+import com.hashedin.reservation.entity.Restaurant;
 import com.hashedin.reservation.entity.RestaurantUser;
 import com.hashedin.reservation.services.UserService;
+import com.hashedin.reservation.repository.ReservationRequestRepository;
+import com.hashedin.reservation.repository.RestaurantRepository;
 import com.hashedin.reservation.repository.UserRepository;
 import java.util.Optional;
-
-import javax.management.relation.RoleNotFoundException;
 
 @Service
 public class UserServiceImpl implements UserService{
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ReservationRequestRepository reservationRequestRepository;
+
+    
+    @Autowired
+    private SecurityUtil securityUtil;
+
+    @Autowired
+    private RestaurantRepository restaurantRepository;
 
     
 
@@ -77,6 +89,19 @@ public class UserServiceImpl implements UserService{
     public List<RestaurantUser> getAllUsers() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getAllUsers'");
+    }
+
+    public List<ReservationRequest> getReservations() {
+        RestaurantUser user = (getUserByEmail(securityUtil.getCurrentUsername()));
+        List<ReservationRequest> userReservations = reservationRequestRepository.findByUserId(user.getId());
+        return userReservations;
+    }
+
+    public List<ReservationRequest> getRestaurantReservations() {
+        RestaurantUser user = (getUserByEmail(securityUtil.getCurrentUsername()));
+        Restaurant restaurant = restaurantRepository.findByManagerId(user.getId());
+        List<ReservationRequest> restaurantReservations = reservationRequestRepository.findByRestaurantId(restaurant.getId());
+        return restaurantReservations;
     }
     
     

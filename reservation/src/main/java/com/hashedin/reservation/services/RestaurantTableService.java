@@ -17,5 +17,5 @@ public interface RestaurantTableService {
     
     RestaurantTable updateRestaurantTable(Long id, RestaurantTable updatedTable) throws Exception;
     
-    void deleteRestaurantTable(Long id);
+    void deleteRestaurantTable(Long id) throws Exception;
 }

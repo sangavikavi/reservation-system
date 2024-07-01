@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.hashedin.reservation.Config.SecurityUtil;
 import com.hashedin.reservation.Dtos.RequestDtos.UserEntryDto;
 import com.hashedin.reservation.entity.JwtRequest;
 import com.hashedin.reservation.entity.JwtResponse;
@@ -41,6 +42,12 @@ public class UserController {
 
     @Autowired
     private JWTHelper helper;
+
+    @Autowired
+    private SecurityUtil securityUtil;
+
+    @Autowired
+    private UserServiceImpl uService;
 
     @PostMapping("user/login")
     public ResponseEntity<?> loginUser(@RequestBody JwtRequest request) {
@@ -108,6 +115,25 @@ public class UserController {
             throw new BadCredentialsException("Invalid password");
         }
 
+    }
+
+    @PostMapping("user/mybookings")
+    public ResponseEntity<?> getMyBookings() {
+        try{
+            return ResponseEntity.ok(uService.getReservations());
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("manager/restaurantbookings")
+    public ResponseEntity<?> getRestaurantBookings() {
+        try {
+            return ResponseEntity.ok(uService.getRestaurantReservations());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @ExceptionHandler(BadCredentialsException.class)
