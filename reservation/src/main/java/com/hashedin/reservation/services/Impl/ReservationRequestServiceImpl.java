@@ -19,10 +19,15 @@ import com.hashedin.reservation.entity.Restaurant;
 import com.hashedin.reservation.entity.RestaurantTable;
 import com.hashedin.reservation.entity.RestaurantUser;
 import com.hashedin.reservation.services.ReservationRequestService;
+
+import lombok.extern.slf4j.Slf4j;
+
 import com.hashedin.reservation.repository.ReservationRequestRepository;
 import com.hashedin.reservation.repository.ReservationRespository;
 import com.hashedin.reservation.repository.RestaurantRepository;
 import com.hashedin.reservation.repository.RestaurantTableRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class implements the ReservationRequestService interface and provides
@@ -30,8 +35,12 @@ import com.hashedin.reservation.repository.RestaurantTableRepository;
  * It also provides methods to retrieve reservations by table, by ID, and for
  * getting all reservations.
  */
+
+@Slf4j
 @Service
 public class ReservationRequestServiceImpl implements ReservationRequestService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ReservationRequestServiceImpl.class);
 
     @Autowired
     private ReservationRespository reservationRepository;
@@ -71,8 +80,9 @@ public class ReservationRequestServiceImpl implements ReservationRequestService 
         // This needs to be checked in frontend itself
         // If all the above conditions are satisfied then create the reservation
         // Else throw an exception
-
+        logger.info("Creating reservation");
         if (getReservationsbyTable(reservation.getTableId()) != null) {
+            logger.error("Table already reserved");
             throw new Exception("Table already reserved");
         }
 
@@ -81,13 +91,16 @@ public class ReservationRequestServiceImpl implements ReservationRequestService 
         List<String> workingDays = restaurant.getWorkingDays();
         int requestedDay = reservation.getRequestDate().getDay();
         if (!workingDays.contains(days.get(requestedDay))) {
+            logger.error("Restaurant is closed on the requested day");
             throw new Exception("Restaurant is closed on the requested day");
         }
         if (restaurant.getCapacity() < reservation.getNumberOfGuests()) {
+            logger.error("Restaurant does not have enough capacity");
             throw new Exception("Restaurant does not have enough capacity");
         }
         if (restaurant.getOpeningTime().getHour() < reservation.getSlotStartTime().getHour()
                 || restaurant.getClosingTime().getHour() > reservation.getSlotEndTime().getHour()) {
+            logger.error("Restaurant is closed at the requested time");
             throw new Exception("Restaurant is closed at the requested time");
         }
 
@@ -104,6 +117,7 @@ public class ReservationRequestServiceImpl implements ReservationRequestService 
         reservationRepository.save(newReservation);
         RestaurantTable table = tableRepository.findById(reservation.getTableId()).get();
         if (table.getCapacity() < reservation.getNumberOfGuests()) {
+            logger.error("Table does not have enough capacity");
             throw new Exception("Table does not have enough capacity Please book a bigger table");
         }
         newReservation.setTable(table);
@@ -118,20 +132,23 @@ public class ReservationRequestServiceImpl implements ReservationRequestService 
         reservationRequest.setCreatedAt(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
         reservationRequest.setUpdatedAt(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
         reservationRequest.setReservation(newReservation);
+        logger.info("Reservation created successfully");
         return reservationRequestRepository.save(reservationRequest);
     }
 
     public ReservationRequest getReservationsbyTable(Long tableId) {
+        logger.info("Getting reservation by table");
         return reservationRequestRepository.findByTableId(tableId);
     }
 
     @Override
-    public ReservationRequest getReservationById(Long id) {
+    public ReservationRequest getReservationById(Long id) throws Exception {
         Optional<ReservationRequest> reservation = reservationRequestRepository.findById(id);
         if (reservation.isPresent()) {
             return reservation.get();
         }
-        return null;
+        logger.error("Reservation not found");
+        throw new Exception("Reservation not found");
     }
 
     @Override
@@ -140,9 +157,11 @@ public class ReservationRequestServiceImpl implements ReservationRequestService 
     }
 
     @Override
-    public ReservationRequest updateReservation(ReservationRequest reservation) {
+    public ReservationRequest updateReservation(ReservationRequest reservation) throws Exception {
+        logger.info("Updating reservation");
         Optional<ReservationRequest> reservationData = reservationRequestRepository.findById(reservation.getId());
         if (reservationData.isPresent()) {
+            logger.info("Reservation found");
             ReservationRequest _reservation = reservationData.get();
             // _reservation.setRequestDate(reservation.getRequestDate());
             // _reservation.setSlotStartTime(reservation.getSlotStartTime());
@@ -151,23 +170,28 @@ public class ReservationRequestServiceImpl implements ReservationRequestService 
             _reservation.setUpdatedAt(reservation.getUpdatedAt());
             reservationRequestRepository.save(_reservation);
         }
-        return null;
+        logger.error("Reservation not found");
+        throw new Exception("Reservation not found");
     }
 
     @Override
     public void cancelReservation(Long id) throws Exception {
+        logger.info("Cancelling reservation");
         if (reservationRequestRepository.findById(id).isPresent()) {
-
+            logger.info("Reservation found");
             ReservationRequest reservationRequest = reservationRequestRepository.findById(id).get();
             if (reservationRequest.getReservation().getStatus().equals("PENDING")) {
+                logger.info("Reservation is pending so Cancelling it");
                 reservationRequest.getReservation().setStatus("CANCELLED");
                 reservationRepository.delete(reservationRequest.getReservation());
             }
 
             if (reservationRequest.getReservation().getStatus().equals("CONFIRMED")) {
+                logger.info("Reservation is confirmed so pending with manager");
                 reservationRequest.getReservation().setStatus("PENDINGFORCANCELLATION");
             }
         } else {
+            logger.error("Reservation not found");
             throw new Exception("Reservation Request not Found");
         }
 
@@ -178,34 +202,41 @@ public class ReservationRequestServiceImpl implements ReservationRequestService 
     }
 
     public void approveReservationRequest(Long id) throws Exception {
+        logger.info("Approving reservation");
 
         try {
             if (!reservationRequestRepository.findById(id).isPresent()) {
+                logger.error("Reservation Request not found");
                 throw new Exception("Reservation Request not Found");
             }
             ReservationRequest reservationRequest = reservationRequestRepository.findById(id).get();
             reservationRequest.getReservation().setStatus("CONFIRMED");
+            logger.info("Reservation confirmed");
 
             Reservation reservation = reservationRepository.findById(reservationRequest.getReservation().getId()).get();
             reservation.setStatus("CONFIRMED");
             reservationRepository.save(reservation);
             reservationRequestRepository.save(reservationRequest);
         } catch (Exception e) {
+            logger.error("Failed to approve reservation");
             throw new Exception(e.getMessage());
         }
 
     }
 
     public void rejectReservationRequest(Long id) throws Exception {
+        logger.info("Rejecting reservation");
         try {
             if (!reservationRequestRepository.findById(id).isPresent()) {
+                logger.error("Reservation Request not found");
                 throw new Exception("Reservation Request not Found");
             }
             ReservationRequest reservationRequest = reservationRequestRepository.findById(id).get();
             reservationRequest.getReservation().setStatus("REJECTED");
-
+            logger.info("Reservation Request rejected");
             Reservation reservation = reservationRepository.findById(reservationRequest.getReservation().getId()).get();
             reservation.setStatus("CANCELLED");
+            logger.info("Reservation cancelled");   
             reservationRepository.delete(reservation);
             reservationRequestRepository.save(reservationRequest);
         } catch (Exception e) {
@@ -215,18 +246,21 @@ public class ReservationRequestServiceImpl implements ReservationRequestService 
     }
 
     public void approveCancellationRequest(Long id) throws Exception {
+        logger.info("Accepting cancellation");
         try {
             if (!reservationRequestRepository.findById(id).isPresent()) {
+                logger.error("Reservation Request not found");
                 throw new Exception("Reservation Request not Found");
             }
             ReservationRequest reservationRequest = reservationRequestRepository.findById(id).get();
             reservationRequest.getReservation().setStatus("CANCELLED");
-
+            logger.info("Reservation cancelled");
             Reservation reservation = reservationRepository.findById(reservationRequest.getReservation().getId()).get();
             reservation.setStatus("CANCELLED");
             reservationRepository.delete(reservation);
             reservationRequestRepository.save(reservationRequest);
         } catch (Exception e) {
+            logger.error("Failed to accept cancellation");
             throw new Exception(e.getMessage());
 
         }

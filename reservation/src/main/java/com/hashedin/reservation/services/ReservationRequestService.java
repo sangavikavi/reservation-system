@@ -11,11 +11,11 @@ public interface ReservationRequestService {
 
     ReservationRequest createReservation(ReservationRequestDto reservationRequest) throws Exception;
 
-    ReservationRequest getReservationById(Long id);
+    ReservationRequest getReservationById(Long id) throws Exception;
 
     List<ReservationRequest> getAllReservations();
 
-    ReservationRequest updateReservation(ReservationRequest reservation);
+    ReservationRequest updateReservation(ReservationRequest reservation) throws Exception;
 
     void cancelReservation(Long id) throws Exception;
 
