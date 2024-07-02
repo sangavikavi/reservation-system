@@ -1,5 +1,6 @@
 package com.hashedin.reservation.entity;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
 
@@ -37,7 +38,7 @@ public class Reservation {
 
 
     @Column(nullable = false)
-    private Date reservationDate;
+    private LocalDate reservationDate;
 
     @Column(nullable = false)
     private LocalTime slotStartTime;

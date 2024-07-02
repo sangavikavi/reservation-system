@@ -12,7 +12,7 @@ public interface ReservationRequestRepository extends JpaRepository<ReservationR
 
     Optional<ReservationRequest> findById(Long id);
 
-    ReservationRequest findByTableId(Long tableId);
+    List<ReservationRequest> findByTableId(Long tableId);
 
     List<ReservationRequest> findByUserId(Long userId);
 

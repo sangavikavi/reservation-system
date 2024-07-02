@@ -107,4 +107,16 @@ public class ReservationRequestController {
         }
     }
 
+    @PostMapping("table/{tableId}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> getReservationsByTable(@PathVariable Long tableId) {
+        try {
+            logger.info("Getting all reservations for table with ID: {}", tableId);
+            return ResponseEntity.ok(reservationService.getReservationsbyTable(tableId));
+        } catch (Exception e) {
+            logger.error("Failed to get reservations for table with ID: {}", tableId, e);
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }

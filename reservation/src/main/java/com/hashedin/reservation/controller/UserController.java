@@ -23,6 +23,8 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -140,7 +142,7 @@ public class UserController {
         logger.info("User authenticated: {}", email);
     }
 
-    @PostMapping("user/mybookings")
+    @GetMapping("user/mybookings")
     public ResponseEntity<?> getMyBookings() {
         logger.info("Fetching user bookings");
         try {
@@ -151,13 +153,24 @@ public class UserController {
         }
     }
 
-    @PostMapping("manager/restaurantbookings")
-    public ResponseEntity<?> getRestaurantBookings() {
+    @GetMapping("manager/restaurantbookings/{id}")
+    public ResponseEntity<?> getRestaurantBookings(@PathVariable Long id) {
         logger.info("Fetching restaurant bookings");
         try {
-            return ResponseEntity.ok(userService.getRestaurantReservations());
+            return ResponseEntity.ok(userService.getRestaurantReservations(id));
         } catch (Exception e) {
             logger.error("Failed to fetch restaurant bookings: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("manager/restaurants")
+    public ResponseEntity<?> getRestaurants() {
+        logger.info("Fetching all restaurants");
+        try {
+            return ResponseEntity.ok(userService.getManagerRestaurants());
+        } catch (Exception e) {
+            logger.error("Failed to fetch restaurants: {}", e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

@@ -10,9 +10,10 @@ import com.hashedin.reservation.entity.Restaurant;
 
 @Repository
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
+    Restaurant findById(long id);
     List<Restaurant> findByLocation(String location);
 
     Object findByname(String name);
 
-    Restaurant findByManagerId(Long Id);
+    List<Restaurant> findByManagerId(Long Id);
 }

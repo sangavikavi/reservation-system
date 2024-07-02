@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
@@ -30,7 +30,6 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private ReservationRequestRepository reservationRequestRepository;
 
-    
     @Autowired
     private SecurityUtil securityUtil;
 
@@ -38,27 +37,26 @@ public class UserServiceImpl implements UserService{
     private RestaurantRepository restaurantRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
-    
 
     @Override
     public void updateUser(UserEntryDto user) throws Exception {
         logger.info("Updating user: {}", user.getEmail());
         Optional<RestaurantUser> _user = userRepository.findByEmail(user.getEmail());
-        if (!_user.isPresent()){
+        if (!_user.isPresent()) {
             logger.error("User not present: {}", user.getEmail());
             throw new Exception("User not present please register");
         }
-       _user.get().setEmail(user.getEmail());
-       _user.get().setFullName(user.getFullName());
-       _user.get().setPhoneNumber(user.getPhoneNumber());
-       _user.get().setPassword(user.getPassword());
-       logger.info("User updated successfully: {}", user.getEmail());
-       userRepository.save(_user.get());   
+        _user.get().setEmail(user.getEmail());
+        _user.get().setFullName(user.getFullName());
+        _user.get().setPhoneNumber(user.getPhoneNumber());
+        _user.get().setPassword(user.getPassword());
+        logger.info("User updated successfully: {}", user.getEmail());
+        userRepository.save(_user.get());
     }
 
     @Transactional
     @Override
-    public RestaurantUser registerUser(UserEntryDto userDto,String role) throws Exception{
+    public RestaurantUser registerUser(UserEntryDto userDto, String role) throws Exception {
         logger.info("Registering user: {}", userDto.getEmail());
         // Create User entity and save
         // Before creating check if the user is already present
@@ -74,19 +72,18 @@ public class UserServiceImpl implements UserService{
         return userRepository.save(user);
     }
 
-
     @Override
     public void deleteUser(Long userId) {
-        //  Delete user only after checking if the user is present
+        // Delete user only after checking if the user is present
 
     }
 
     @Override
     public RestaurantUser getUserById(Long userId) {
-        //  Get user only after checking if the user is present
+        // Get user only after checking if the user is present
         return userRepository.getById(userId);
     }
-    
+
     @Override
     public RestaurantUser getUserByEmail(String userId) {
         // Get user only after checking if the user is present
@@ -107,14 +104,30 @@ public class UserServiceImpl implements UserService{
         return userReservations;
     }
 
-    public List<ReservationRequest> getRestaurantReservations() {
+    public List<ReservationRequest> getRestaurantReservations(Long id) {
         logger.info("Fetching restaurant bookings");
         RestaurantUser user = (getUserByEmail(securityUtil.getCurrentUsername()));
-        Restaurant restaurant = restaurantRepository.findByManagerId(user.getId());
-        List<ReservationRequest> restaurantReservations = reservationRequestRepository.findByRestaurantId(restaurant.getId());
+        Restaurant restaurant = restaurantRepository.findById(id).get();
+        List<ReservationRequest> restaurantReservations = reservationRequestRepository
+                .findByRestaurantId(restaurant.getId());
         logger.info("Restaurant bookings fetched successfully");
         return restaurantReservations;
     }
-    
-    
+
+    public List<Restaurant> getManagerRestaurants() throws Exception {
+        try {
+
+            logger.info("Fetching all restaurants");
+            RestaurantUser user = (getUserByEmail(securityUtil.getCurrentUsername()));
+            List<Restaurant> restaurants = restaurantRepository.findByManagerId(user.getId());
+            logger.info("Fetched {} restaurants", restaurants.size());
+            return restaurants;
+
+        } catch (Exception e) {
+            throw new Exception("Failed to fetch restaurants: " + e.getMessage());
+
+        }
+
+    }
+
 }

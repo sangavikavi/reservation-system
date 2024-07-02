@@ -46,7 +46,7 @@ public class RestaurantServiceImpl implements RestaurantService {
         if (restaurantRepository.findByname(restaurant.getName()) != null) {
             logger.warn("Restaurant already exists: {}", restaurant.getName());
             throw new Exception("Restaurant already exists. Please try with a different name");
-        }
+        }    
         Restaurant newRestaurant = new Restaurant();
         newRestaurant.setName(restaurant.getName());
         newRestaurant.setLocation(restaurant.getLocation());
