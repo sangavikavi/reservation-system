@@ -6,6 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,7 +15,6 @@ import com.hashedin.reservation.services.Impl.ReservationRequestServiceImpl;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.web.bind.annotation.RequestBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,19 +28,31 @@ public class ReservationRequestController {
     @Autowired
     private ReservationRequestServiceImpl reservationService;
 
+    /**
+     * Endpoint to create a new reservation.
+     *
+     * @param reservationRequest The reservation request DTO.
+     * @return ResponseEntity with the status of the reservation creation.
+     */
     @PostMapping("/create")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> createReservation(@RequestBody ReservationRequestDto reservationRequest) {
         try {
             logger.info("Creating reservation");
-            return ResponseEntity
-                    .ok("Reservation created successfully" + reservationService.createReservation(reservationRequest));
+            reservationService.createReservation(reservationRequest);
+            return ResponseEntity.ok("Reservation created successfully");
         } catch (Exception e) {
             logger.error("Failed to create reservation", e);
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
+    /**
+     * Endpoint to get all reservations for a specific restaurant.
+     *
+     * @param restaurantId The ID of the restaurant.
+     * @return ResponseEntity with the list of reservations for the restaurant.
+     */
     @GetMapping("/{restaurantId}")
     @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<?> getAllReservationsbyRestaurant(@PathVariable Long restaurantId) {
@@ -51,9 +63,14 @@ public class ReservationRequestController {
             logger.error("Failed to get reservations for restaurant with ID: {}", restaurantId, e);
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-
     }
 
+    /**
+     * Endpoint to approve a reservation.
+     *
+     * @param reservationId The ID of the reservation to be approved.
+     * @return ResponseEntity with the status of the reservation approval.
+     */
     @PostMapping("/approve/{reservationId}")
     @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<?> approveReservation(@PathVariable Long reservationId) {
@@ -67,6 +84,12 @@ public class ReservationRequestController {
         }
     }
 
+    /**
+     * Endpoint to reject a reservation.
+     *
+     * @param reservationId The ID of the reservation to be rejected.
+     * @return ResponseEntity with the status of the reservation rejection.
+     */
     @PostMapping("/reject/{reservationId}")
     @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<?> rejectReservation(@PathVariable Long reservationId) {
@@ -80,6 +103,12 @@ public class ReservationRequestController {
         }
     }
 
+    /**
+     * Endpoint to accept a cancellation request for a reservation.
+     *
+     * @param reservationId The ID of the reservation for which the cancellation is accepted.
+     * @return ResponseEntity with the status of the cancellation acceptance.
+     */
     @PostMapping("/acceptcancellation/{reservationId}")
     @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<?> acceptCancellation(@PathVariable Long reservationId) {
@@ -93,7 +122,12 @@ public class ReservationRequestController {
         }
     }
 
-
+    /**
+     * Endpoint to cancel a reservation.
+     *
+     * @param reservationId The ID of the reservation to be cancelled.
+     * @return ResponseEntity with the status of the reservation cancellation.
+     */
     @PostMapping("/cancel/{reservationId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> cancelReservation(@PathVariable Long reservationId) {
@@ -107,6 +141,12 @@ public class ReservationRequestController {
         }
     }
 
+    /**
+     * Endpoint to get all reservations for a specific table.
+     *
+     * @param tableId The ID of the table.
+     * @return ResponseEntity with the list of reservations for the table.
+     */
     @PostMapping("table/{tableId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getReservationsByTable(@PathVariable Long tableId) {

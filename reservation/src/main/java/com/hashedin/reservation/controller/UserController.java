@@ -32,6 +32,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The UserController class is responsible for handling HTTP requests related to user operations.
+ * It provides endpoints for user login, registration, and retrieving user bookings.
+ */
 @RestController
 @Slf4j
 public class UserController {
@@ -50,6 +54,14 @@ public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
+    
+    /**
+     * Authenticates the user and generates a JWT token for successful login.
+     *
+     * @param request The JwtRequest object containing the user's email and password.
+     * @return ResponseEntity containing the JWT token and the user's username if login is successful,
+     *         or an error response if login fails.
+     */
     @PostMapping("user/login")
     public ResponseEntity<?> loginUser(@RequestBody JwtRequest request) {
         logger.info("User login attempt: {}", request.getEmail());
@@ -74,6 +86,13 @@ public class UserController {
         }
     }
 
+    /**
+     * Registers a new user.
+     *
+     * @param user The UserEntryDto object containing the user's details.
+     * @return ResponseEntity containing a success message if registration is successful,
+     *         or an error response if registration fails.
+     */
     @PostMapping("user/register")
     public ResponseEntity<?> registerUser(@RequestBody UserEntryDto user) {
         logger.info("User registration attempt: {}", user.getEmail());
@@ -87,6 +106,13 @@ public class UserController {
         }
     }
 
+    /**
+     * Authenticates the manager and generates a JWT token for successful login.
+     *
+     * @param request The JwtRequest object containing the manager's email and password.
+     * @return ResponseEntity containing the JWT token and the manager's username if login is successful,
+     *         or an error response if login fails.
+     */
     @PostMapping("manager/login")
     public ResponseEntity<?> loginManager(@RequestBody JwtRequest request) {
         logger.info("Manager login attempt: {}", request.getEmail());
@@ -111,6 +137,13 @@ public class UserController {
         }
     }
 
+    /**
+     * Registers a new manager.
+     *
+     * @param user The UserEntryDto object containing the manager's details.
+     * @return ResponseEntity containing a success message if registration is successful,
+     *         or an error response if registration fails.
+     */
     @PostMapping("manager/register")
     public ResponseEntity<?> registerManager(@RequestBody UserEntryDto user) throws Exception {
         logger.info("Manager registration attempt: {}", user.getEmail());
@@ -124,6 +157,12 @@ public class UserController {
         }
     }
 
+    /**
+     * Authenticates the user.
+     *
+     * @param email The user's email.
+     * @param password The user's password.
+     */
     private void doAuthenticate(String email, String password) {
         logger.info("Authenticating user: {}", email);
         Optional<RestaurantUser> user = userRepository.findByEmail(email);
@@ -142,6 +181,12 @@ public class UserController {
         logger.info("User authenticated: {}", email);
     }
 
+    
+    /**
+     * Retrieves the bookings made by the user.
+     *
+     * @return ResponseEntity containing the user's bookings if successful, or a bad request response with an error message if an exception occurs.
+     */
     @GetMapping("user/mybookings")
     public ResponseEntity<?> getMyBookings() {
         logger.info("Fetching user bookings");
@@ -153,6 +198,13 @@ public class UserController {
         }
     }
 
+    
+    /**
+     * Retrieves the bookings for a specific restaurant.
+     *
+     * @param id The ID of the restaurant.
+     * @return A ResponseEntity containing the restaurant bookings.
+     */
     @GetMapping("manager/restaurantbookings/{id}")
     public ResponseEntity<?> getRestaurantBookings(@PathVariable Long id) {
         logger.info("Fetching restaurant bookings");
@@ -164,6 +216,11 @@ public class UserController {
         }
     }
 
+    /**
+     * Retrieves all restaurants managed by the user.
+     *
+     * @return ResponseEntity containing the list of restaurants
+     */
     @GetMapping("manager/restaurants")
     public ResponseEntity<?> getRestaurants() {
         logger.info("Fetching all restaurants");
@@ -175,9 +232,16 @@ public class UserController {
         }
     }
 
+    /**
+     * Handles the exception thrown when the user provides bad credentials.
+     *
+     * @param e The BadCredentialsException that was thrown.
+     * @return A string indicating that the credentials are invalid.
+     */
     @ExceptionHandler(BadCredentialsException.class)
     public String exceptionHandler(BadCredentialsException e) {
         logger.error("Bad credentials exception: {}", e.getMessage());
         return "Credentials Invalid !!";
     }
+
 }

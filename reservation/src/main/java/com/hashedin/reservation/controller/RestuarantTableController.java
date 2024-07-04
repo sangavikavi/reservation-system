@@ -24,6 +24,11 @@ public class RestuarantTableController {
     @Autowired
     private RestaurantTableServiceImpl tableService;
 
+    /**
+     * Get all restaurant tables.
+     *
+     * @return List of all restaurant tables
+     */
     @GetMapping
     public List<RestaurantTable> getAllTables() {
         log.info("Getting all tables");
@@ -35,6 +40,12 @@ public class RestuarantTableController {
     // return tableService.getRestaurantTableById(id);
     // }
 
+    /**
+     * Create a new restaurant table.
+     *
+     * @param table The restaurant table to be created
+     * @return ResponseEntity with success message or error message
+     */
     @PostMapping("/add")
     public ResponseEntity<?> createTable(@RequestBody RestaurantTableDto table) {
         try {
@@ -47,6 +58,13 @@ public class RestuarantTableController {
         return ResponseEntity.ok("Table created successfully");
     }
 
+    /**
+     * Update an existing restaurant table.
+     *
+     * @param id    The ID of the restaurant table to be updated
+     * @param table The updated restaurant table
+     * @return ResponseEntity with the updated restaurant table or error message
+     */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateTable(@PathVariable Long id, @RequestBody RestaurantTable table) {
 
@@ -58,6 +76,12 @@ public class RestuarantTableController {
         }
     }
 
+    /**
+     * Delete a restaurant table.
+     *
+     * @param id The ID of the restaurant table to be deleted
+     * @return ResponseEntity with success message or error message
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTable(@PathVariable Long id) {
         // tableRepository.delete(id);

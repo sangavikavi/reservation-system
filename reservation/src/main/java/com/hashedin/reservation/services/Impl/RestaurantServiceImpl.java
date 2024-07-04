@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.hashedin.reservation.Config.SecurityUtil;
@@ -40,6 +42,13 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     private static final Logger logger = LoggerFactory.getLogger(RestaurantServiceImpl.class);
 
+    /**
+     * Creates a new restaurant based on the provided restaurant data.
+     *
+     * @param restaurant The restaurant data to create a new restaurant.
+     * @return The newly created restaurant.
+     * @throws Exception If the restaurant already exists with the same name.
+     */
     @Override
     public Restaurant createRestaurant(RestaurantDto restaurant) throws Exception {
         logger.info("Attempting to create restaurant: {}", restaurant.getName());
@@ -62,7 +71,14 @@ public class RestaurantServiceImpl implements RestaurantService {
         logger.info("Restaurant created successfully: {}", savedRestaurant.getName());
         return savedRestaurant;
     }
-
+    
+    /**
+     * Retrieves a restaurant by its ID.
+     *
+     * @param id The ID of the restaurant to retrieve.
+     * @return The RestaurantResponseDto object containing the restaurant and its tables.
+     * @throws Exception If the restaurant is not found.
+     */
     @Override
     public RestaurantResponseDto getRestaurantById(Long id) throws Exception {
         logger.info("Fetching restaurant by id: {}", id);
@@ -79,14 +95,25 @@ public class RestaurantServiceImpl implements RestaurantService {
         throw new Exception("Restaurant not found");
     }
 
+    /**
+        * Retrieves a list of all restaurants.
+        *
+        * @return a list of Restaurant objects representing all the restaurants
+        */
     @Override
-    public List<Restaurant> getAllRestaurants() {
-        logger.info("Fetching all restaurants");
-        List<Restaurant> restaurants = restaurantRepository.findAll();
-        logger.info("Fetched {} restaurants", restaurants.size());
-        return restaurants;
+    public Page<Restaurant> getAllRestaurants(int page, int size) {
+        PageRequest pageable = PageRequest.of(page, size);
+        return restaurantRepository.findAll(pageable);
     }
 
+
+    /**
+        * Updates a restaurant with the given ID.
+        *
+        * @param id         The ID of the restaurant to update.
+        * @param restaurant The updated restaurant object.
+        * @return The updated restaurant object if the restaurant is found and updated successfully, null otherwise.
+        */
     @Override
     public Restaurant updateRestaurant(Long id, Restaurant restaurant) {
         logger.info("Updating restaurant: {}", id);
@@ -104,6 +131,11 @@ public class RestaurantServiceImpl implements RestaurantService {
         return null;
     }
 
+    /**
+        * Deletes a restaurant with the specified ID.
+        *
+        * @param id the ID of the restaurant to be deleted
+        */
     @Override
     public void deleteRestaurant(Long id) {
         logger.info("Deleting restaurant: {}", id);

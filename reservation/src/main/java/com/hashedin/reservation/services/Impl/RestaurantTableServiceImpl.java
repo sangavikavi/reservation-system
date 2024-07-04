@@ -31,6 +31,13 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
 
     private static final Logger logger = LoggerFactory.getLogger(RestaurantTableServiceImpl.class);
 
+    /**
+     * Creates a new restaurant table.
+     *
+     * @param restaurantTable The restaurant table DTO containing the table details.
+     * @return The created restaurant table.
+     * @throws Exception If the restaurant ID is missing or the restaurant is not found.
+     */
     @Override
     public RestaurantTable createRestaurantTable(RestaurantTableDto restaurantTable) throws Exception {
         logger.info("Attempting to create restaurant table: {}", restaurantTable.getTableNumber());
@@ -53,6 +60,12 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
         return savedTable;
     }
 
+    /**
+     * Retrieves a restaurant table by its ID.
+     *
+     * @param id The ID of the restaurant table.
+     * @return The restaurant table with the specified ID, or null if not found.
+     */
     @Override
     public RestaurantTable getRestaurantTableById(Long id) {
         logger.info("Fetching restaurant table by id: {}", id);
@@ -66,6 +79,11 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
         }
     }
 
+    /**
+     * Retrieves all restaurant tables.
+     *
+     * @return A list of all restaurant tables.
+     */
     @Override
     public List<RestaurantTable> getAllRestaurantTables() {
         logger.info("Fetching all restaurant tables");
@@ -74,6 +92,14 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
         return tables;
     }
 
+    /**
+     * Updates a restaurant table.
+     *
+     * @param id           The ID of the restaurant table to update.
+     * @param updatedTable The updated restaurant table.
+     * @return The updated restaurant table.
+     * @throws Exception If the table has bookings or if the table is not found.
+     */
     @Override
     public RestaurantTable updateRestaurantTable(Long id, RestaurantTable updatedTable) throws Exception {
         logger.info("Updating restaurant table: {}", id);
@@ -95,6 +121,12 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
         throw new Exception("Table not found");
     }
 
+    /**
+     * Deletes a restaurant table.
+     *
+     * @param id The ID of the restaurant table to delete.
+     * @throws Exception If the table has bookings or if the table is not found.
+     */
     @Override
     public void deleteRestaurantTable(Long id) throws Exception {
         logger.info("Deleting restaurant table: {}", id);
@@ -106,6 +138,12 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
         logger.info("Restaurant table deleted successfully: {}", id);
     }
 
+    /**
+     * Retrieves all tables for a given restaurant ID.
+     *
+     * @param id The ID of the restaurant.
+     * @return A list of all tables for the specified restaurant ID.
+     */
     public List<RestaurantTable> getTablesByRestaurantId(Long id) {
         logger.info("Fetching tables for restaurant id: {}", id);
         List<RestaurantTable> restaurantTables = restaurantTableRepository.findByRestaurantId(id);

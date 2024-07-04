@@ -1,3 +1,9 @@
+/**
+ * This class implements the ReservationRequestService interface and provides
+ * the implementation for creating, updating, and canceling reservations.
+ * It also provides methods to retrieve reservations by table, by ID, and for
+ * getting all reservations.
+ */
 package com.hashedin.reservation.services.Impl;
 
 import java.time.LocalDate;
@@ -74,6 +80,13 @@ public class ReservationRequestServiceImpl implements ReservationRequestService 
         }
     };
 
+    /**
+     * Creates a new reservation based on the provided reservation request.
+     *
+     * @param reservation The reservation request containing the details of the reservation.
+     * @return The created reservation request.
+     * @throws Exception If any error occurs during the reservation creation process.
+     */
     @Override
     public ReservationRequest createReservation(ReservationRequestDto reservation) throws Exception {
         // First check if the restratant is available (working )
@@ -148,6 +161,15 @@ public class ReservationRequestServiceImpl implements ReservationRequestService 
         return reservationRequestRepository.save(reservationRequest);
     }
 
+    /**
+     * Checks if a table is already reserved for a given date and time slot.
+     *
+     * @param tableId       the ID of the table to check
+     * @param requestDate   the date of the reservation request
+     * @param slotStartTime the start time of the reservation slot
+     * @param slotEndTime   the end time of the reservation slot
+     * @return true if the table is already reserved, false otherwise
+     */
     private boolean isTableAlreadyReserved(Long tableId, Date requestDate, LocalTime slotStartTime,
             LocalTime slotEndTime) {
         List<Reservation> allReservations = reservationRepository.findAll();
@@ -165,6 +187,13 @@ public class ReservationRequestServiceImpl implements ReservationRequestService 
 
     }
 
+    /**
+     * Retrieves a list of reservation requests for a given table ID.
+     *
+     * @param tableId the ID of the table
+     * @return a list of reservation requests for the specified table ID
+     * @throws Exception if an error occurs while retrieving the reservation requests
+     */
     public List<ReservationRequest> getReservationsbyTable(Long tableId) throws Exception {
 
         try {
@@ -178,6 +207,13 @@ public class ReservationRequestServiceImpl implements ReservationRequestService 
 
     }
 
+    /**
+        * Retrieves a reservation request by its ID.
+        *
+        * @param id the ID of the reservation request to retrieve
+        * @return the reservation request with the specified ID
+        * @throws Exception if the reservation request is not found
+        */
     @Override
     public ReservationRequest getReservationById(Long id) throws Exception {
         Optional<ReservationRequest> reservation = reservationRequestRepository.findById(id);
@@ -188,11 +224,23 @@ public class ReservationRequestServiceImpl implements ReservationRequestService 
         throw new Exception("Reservation not found");
     }
 
+    /**
+     * Retrieves all reservation requests.
+     *
+     * @return a list of all reservation requests
+     */
     @Override
     public List<ReservationRequest> getAllReservations() {
         return reservationRequestRepository.findAll();
     }
 
+    /**
+        * Updates a reservation request.
+        *
+        * @param reservation The reservation request to be updated.
+        * @return The updated reservation request.
+        * @throws Exception If the reservation request is not found.
+        */
     @Override
     public ReservationRequest updateReservation(ReservationRequest reservation) throws Exception {
         logger.info("Updating reservation");
@@ -211,6 +259,12 @@ public class ReservationRequestServiceImpl implements ReservationRequestService 
         throw new Exception("Reservation not found");
     }
 
+    /**
+     * Cancels a reservation based on the provided ID.
+     *
+     * @param id the ID of the reservation to be cancelled
+     * @throws Exception if the reservation request is not found
+     */
     @Override
     public void cancelReservation(Long id) throws Exception {
         logger.info("Cancelling reservation");

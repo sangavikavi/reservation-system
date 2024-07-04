@@ -21,6 +21,9 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Implementation of the UserService interface.
+ */
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -38,6 +41,12 @@ public class UserServiceImpl implements UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
+    /**
+     * Updates the user with the given information.
+     *
+     * @param user The user entry DTO containing the updated information.
+     * @throws Exception If the user is not present.
+     */
     @Override
     public void updateUser(UserEntryDto user) throws Exception {
         logger.info("Updating user: {}", user.getEmail());
@@ -54,6 +63,14 @@ public class UserServiceImpl implements UserService {
         userRepository.save(_user.get());
     }
 
+    /**
+     * Registers a new user with the given information and role.
+     *
+     * @param userDto The user entry DTO containing the user information.
+     * @param role    The role of the user.
+     * @return The registered user.
+     * @throws Exception If there is an error during registration.
+     */
     @Transactional
     @Override
     public RestaurantUser registerUser(UserEntryDto userDto, String role) throws Exception {
@@ -72,30 +89,57 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
+    /**
+     * Deletes the user with the given user ID.
+     *
+     * @param userId The ID of the user to be deleted.
+     */
     @Override
     public void deleteUser(Long userId) {
         // Delete user only after checking if the user is present
 
     }
 
+    /**
+     * Retrieves the user with the given user ID.
+     *
+     * @param userId The ID of the user to be retrieved.
+     * @return The user with the given ID.
+     */
     @Override
     public RestaurantUser getUserById(Long userId) {
         // Get user only after checking if the user is present
         return userRepository.getById(userId);
     }
 
+    /**
+     * Retrieves the user with the given email.
+     *
+     * @param userId The email of the user to be retrieved.
+     * @return The user with the given email.
+     */
     @Override
     public RestaurantUser getUserByEmail(String userId) {
         // Get user only after checking if the user is present
         return userRepository.findByEmail(userId).get();
     }
 
+    /**
+     * Retrieves all users.
+     *
+     * @return The list of all users.
+     */
     @Override
     public List<RestaurantUser> getAllUsers() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getAllUsers'");
     }
 
+    /**
+     * Retrieves the reservations of the current user.
+     *
+     * @return The list of reservations of the current user.
+     */
     public List<ReservationRequest> getReservations() {
         logger.info("Fetching user bookings");
         RestaurantUser user = (getUserByEmail(securityUtil.getCurrentUsername()));
@@ -104,6 +148,12 @@ public class UserServiceImpl implements UserService {
         return userReservations;
     }
 
+    /**
+     * Retrieves the reservations of the restaurant with the given ID.
+     *
+     * @param id The ID of the restaurant.
+     * @return The list of reservations of the restaurant.
+     */
     public List<ReservationRequest> getRestaurantReservations(Long id) {
         logger.info("Fetching restaurant bookings");
         RestaurantUser user = (getUserByEmail(securityUtil.getCurrentUsername()));
@@ -114,6 +164,12 @@ public class UserServiceImpl implements UserService {
         return restaurantReservations;
     }
 
+    /**
+     * Retrieves the restaurants managed by the current user.
+     *
+     * @return The list of restaurants managed by the current user.
+     * @throws Exception If there is an error fetching the restaurants.
+     */
     public List<Restaurant> getManagerRestaurants() throws Exception {
         try {
 
